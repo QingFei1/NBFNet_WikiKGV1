@@ -1,0 +1,44 @@
+output_dir: /home/zhuzhaoc/scratch/subgraph_closeness_output/
+
+dataset:
+  class: WikiKG90MNumpy
+  path: ~/projects/rrg-bengioy-ad/graph/dataset
+  num_hop: 2
+  num_neighbor: 100
+  num_negative: 1000
+  strict_negative: no
+
+task:
+  class: KnowledgeGraphEmbeddingKDDCup
+  model:
+    class: BatchedBellmanFordKDDCup
+    gnn_model:
+      class: BatchedSemiringGCNKDDCup
+      input_dim: 32
+      hidden_dims: [32, 32, 32, 32, 32, 32]
+      pna_aggregation: yes
+      short_cut: yes
+    score_model:
+      class: MLPScoreKDDCup
+      embedding_dim: 32
+      num_feature: 2
+      hidden_dims: [128, 1]
+    flip_edge: yes
+    remove_one_hop: 1
+  criterion: bce
+  adversarial_temperature: 1
+  use_cpu_sample: yes
+  batch_down_sample: yes
+
+optimizer:
+  class: Adam
+  lr: 1.0e-3
+
+engine:
+  gpus: [0, 1, 2, 3]
+  batch_size: 1
+  log_interval: 10
+  num_worker: 10
+
+train:
+  num_batch: 1000
